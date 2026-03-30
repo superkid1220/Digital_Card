@@ -2,76 +2,29 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>分享名片</title>
-  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>
-    body { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background-color: #f3f3f3; padding: 20px; text-align: center; }
-    .loader { border: 4px solid #f3f3f3; border-top: 4px solid #C00000; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 10px; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    #error-msg { color: red; font-size: 14px; margin-top: 10px; white-space: pre-wrap; }
-  </style>
+  <title>極簡測試</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <div class="loader" id="loader"></div>
-  <div id="status">正在啟動分享功能...</div>
-  <div id="error-msg"></div>
-
+  <h2 id="msg">初始化中...</h2>
   <script>
-    function showError(msg) {
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('status').innerText = "❌ 無法啟動";
-      document.getElementById('error-msg').innerText = msg;
-    }
-
-    async function main() {
+    async function test() {
       try {
-        // 1. 初始化 LIFF
-        await liff.init({ liffId: "2009646341-cKmE2OE1" });
-
+        await liff.init({ liffId: "2009646341-cKmE2OE1" }); // 確保 ID 正確
         if (!liff.isLoggedIn()) {
           liff.login();
-          return;
-        }
-
-        // 2. 檢查 API 權限 (這是最常出錯的地方)
-        if (!liff.isApiAvailable('shareTargetPicker')) {
-          showError("請至 LINE Developer 後台開啟 'Share target picker' 權限！\n(在 LIFF -> Module / Feature 裡)");
-          return;
-        }
-
-        // 3. 定義名片內容
-        const flexContent = {
-          "type": "bubble", "size": "mega",
-          "header": { "type": "box", "layout": "vertical", "backgroundColor": "#C00000", "contents": [{ "type": "image", "url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png", "size": "xs" }], "paddingTop": "xl", "paddingBottom": "xl" },
-          "body": { "type": "box", "layout": "vertical", "paddingAll": "20px", "contents": [
-            { "type": "text", "text": "陳凱勛 Felis Chen", "weight": "bold", "size": "xl" },
-            { "type": "text", "text": "資深銷售顧問\nTesla Advisor", "size": "sm", "wrap": true, "margin": "md" },
-            { "type": "separator", "margin": "xl" },
-            { "type": "box", "layout": "vertical", "margin": "xl", "spacing": "sm", "contents": [
-              { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "點擊撥打電話", "uri": "tel:+886970474361" } },
-              { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "加入 LINE 官方帳號", "uri": "https://line.me/R/ti/p/@tesla_taiwan" } }
-            ]}
-          ]}
-        };
-
-        // 4. 執行分享
-        const res = await liff.shareTargetPicker([
-          { "type": "flex", "altText": "您收到一張數位名片", "contents": flexContent }
-        ]);
-
-        if (res) {
-          liff.closeWindow(); // 分享成功後關閉
         } else {
-          document.getElementById('status').innerText = "已取消分享";
-          setTimeout(() => liff.closeWindow(), 1000);
+          document.getElementById('msg').innerText = "準備分享...";
+          const res = await liff.shareTargetPicker([
+            { "type": "text", "text": "這是一則測試訊息" }
+          ]);
+          liff.closeWindow();
         }
-
-      } catch (error) {
-        showError("發生錯誤：" + error.message);
+      } catch (e) {
+        document.getElementById('msg').innerText = "錯誤: " + e.message;
       }
     }
-    main();
+    test();
   </script>
 </body>
 </html>
