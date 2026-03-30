@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>數位名片分享</title>
+  <title>美時 Lotus Shirley 數位名片</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body { 
@@ -18,7 +18,7 @@
     }
     .loader { 
       border: 4px solid #f3f3f3; 
-      border-top: 4px solid #C00000; 
+      border-top: 4px solid #E69100; /* Lotus 橘 */
       border-radius: 50%; 
       width: 40px; 
       height: 40px; 
@@ -26,7 +26,7 @@
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     #status { margin-top: 20px; color: #555; font-size: 16px; }
-    #error-msg { margin-top: 10px; color: #C00000; font-size: 14px; padding: 0 20px; text-align: center; }
+    #error-msg { margin-top: 10px; color: #E69100; font-size: 14px; padding: 0 20px; text-align: center; }
   </style>
 </head>
 <body>
@@ -36,7 +36,6 @@
   <div id="error-msg"></div>
 
   <script>
-    // 錯誤顯示函式
     function showError(msg) {
       document.getElementById('loader').style.display = 'none';
       document.getElementById('status').innerText = "❌ 暫時無法分享";
@@ -45,77 +44,93 @@
 
     async function main() {
       try {
-        // 1. 初始化 LIFF (使用你的 ID)
+        // 1. 初始化 LIFF (使用原本的 ID)
         await liff.init({ liffId: "2009646341-cKmE2OE1" });
 
-        // 2. 檢查是否登入
+        // 2. 檢查登入
         if (!liff.isLoggedIn()) {
           liff.login();
           return;
         }
 
-        // 3. 檢查分享權限是否開啟
-        if (!liff.isApiAvailable('shareTargetPicker')) {
-          showError("請確保 LINE Developers 後台已開啟 'Share target picker' 權限。");
-          return;
-        }
-
-        // 4. 定義【傳送給別人看】的名片內容 (無分享按鈕版)
+        // 3. 定義【傳送給別人看】的名片內容 (美時風格, 無分享按鈕)
         const flexContent = {
           "type": "bubble",
           "size": "mega",
+          // 頂部 LOGO 區
           "header": {
             "type": "box",
             "layout": "vertical",
-            "backgroundColor": "#C00000",
+            "backgroundColor": "#FFFFFF",
             "contents": [{
               "type": "image",
-              "url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png",
+              "url": "https://www.lotuspharm.com/images/logo.png", // 美時 LOGO
               "size": "xs",
-              "aspectMode": "fit"
+              "aspectMode": "fit",
+              "margin": "none"
             }],
             "paddingTop": "xl", "paddingBottom": "xl"
           },
+          // 主要資訊區
           "body": {
             "type": "box",
             "layout": "vertical",
             "paddingAll": "20px",
             "contents": [
-              { "type": "text", "text": "陳凱勛 Felis Chen", "weight": "bold", "size": "xl", "color": "#111111" },
-              { "type": "text", "text": "資深銷售顧問\nTesla Advisor", "size": "sm", "color": "#777777", "wrap": true, "margin": "md" },
-              { "type": "text", "text": "kaischen@tesla.com\n+886970474361", "size": "sm", "color": "#777777", "wrap": true, "margin": "lg" },
-              { "type": "text", "text": "臺北市南港區南港路三段 104 號", "size": "sm", "color": "#777777", "wrap": true, "margin": "lg" },
+              // 姓名
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  { "type": "text", "text": "楊涵鈞", "weight": "bold", "size": "xl", "color": "#111111", "flex": 0 },
+                  { "type": "text", "text": "Shirley Yang", "size": "sm", "color": "#777777", "margin": "md", "flex": 0 }
+                ]
+              },
+              // 職稱與部門
+              { "type": "text", "text": "業務代表 / 診所暨藥局業務部", "size": "sm", "color": "#555555", "wrap": true, "margin": "md" },
+              // 聯繫資訊
+              { "type": "text", "text": "shirley.yang@lotuspharm.com\n+886975856707", "size": "sm", "color": "#777777", "wrap": true, "margin": "lg" },
+              // 公司資訊
+              {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "lg",
+                "contents": [
+                  { "type": "text", "text": "美時化學製藥股份有限公司", "size": "xs", "color": "#999999", "wrap": true },
+                  { "type": "text", "text": "110021 台北市信義區松仁路277號17樓", "size": "xs", "color": "#999999", "wrap": true }
+                ]
+              },
+              // 分隔線
               { "type": "separator", "margin": "xl", "color": "#DDDDDD" },
+              // 按鈕區 (無分享按鈕)
               {
                 "type": "box",
                 "layout": "vertical",
                 "margin": "xl",
                 "spacing": "sm",
                 "contents": [
-                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "點擊撥打電話", "uri": "tel:+886970474361" } },
-                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "試駕、換購與家用充電服務", "uri": "https://www.tesla.com/zh_tw/drive" } },
-                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "追蹤官方 Instagram", "uri": "https://www.instagram.com/tesla/" } },
-                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "加入 LINE 官方帳號", "uri": "https://line.me/R/ti/p/@tesla_taiwan" } }
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "點擊撥打電話", "uri": "tel:+886975856707" }, "color": "#E69100" },
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "訪問美時官方網站", "uri": "https://www.lotuspharm.com/zh-TW" }, "color": "#E69100" },
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "追蹤官方 Instagram", "uri": "https://www.instagram.com/tesla/" }, "color": "#E69100" },
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "加入 LINE 官方帳號", "uri": "https://line.me/R/ti/p/@tesla_taiwan" }, "color": "#E69100" }
                 ]
               }
             ]
           }
         };
 
-        // 5. 啟動好友選擇器
+        // 4. 啟動選擇器
         const res = await liff.shareTargetPicker([
           {
             "type": "flex",
-            "altText": "您收到一張來自陳凱勛的數位名片",
+            "altText": "您收到一張來自美時醫藥 Shirley 的數位名片",
             "contents": flexContent
           }
         ]);
 
         if (res) {
-          // 分享成功
-          liff.closeWindow();
+          liff.closeWindow(); // 分享成功
         } else {
-          // 使用者取消分享
           document.getElementById('status').innerText = "已取消分享";
           setTimeout(() => liff.closeWindow(), 1200);
         }
@@ -124,8 +139,6 @@
         showError("發生錯誤：" + error.message);
       }
     }
-
-    // 啟動主程式
     main();
   </script>
 </body>
