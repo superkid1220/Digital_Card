@@ -9,18 +9,26 @@
     body { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: -apple-system, sans-serif; background-color: #f3f3f3; }
     .loader { border: 4px solid #f3f3f3; border-top: 4px solid #E69100; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    #status { margin-top: 20px; color: #555; }
+    #status { margin-top: 20px; color: #555; text-align: center; padding: 0 20px; }
   </style>
 </head>
 <body>
-  <div class="loader"></div>
+  <div class="loader" id="loading-icon"></div>
   <div id="status">正在開啟分享清單...</div>
 
   <script>
     async function main() {
       try {
         await liff.init({ liffId: "2009646341-cKmE2OE1" });
-        if (!liff.isLoggedIn()) { liff.login(); return; }
+        if (!liff.isLoggedIn()) { 
+          liff.login(); 
+          return; 
+        }
+
+        // 檢查是否有開啟 Share Target Picker 權限
+        if (!liff.isApiAvailable('shareTargetPicker')) {
+          throw new Error("LINE Developers 後台尚未開啟 Share Target Picker 權限！");
+        }
 
         // 🌟 分享出去的名片內容
         const flexContent = {
@@ -37,7 +45,7 @@
               "aspectMode": "fit"
             }],
             "paddingTop": "xl", "paddingBottom": "xl"
-          }, // <-- 這裡原本有多一個逗號，已修正
+          },
           "body": {
             "type": "box",
             "layout": "vertical",
@@ -77,11 +85,23 @@
           }
         };
 
-        const res = await liff.shareTargetPicker([{ "type": "flex", "altText": "您收到一張來自美時醫藥 Shirley 的數位名片", "contents": flexContent }]);
-        if (res) { liff.closeWindow(); } else { document.getElementById('status').innerText = "已取消分享"; setTimeout(() => liff.closeWindow(), 1000); }
+        const res = await liff.shareTargetPicker([{ 
+          "type": "flex", 
+          "altText": "您收到一張來自美時醫藥 Shirley 的數位名片", 
+          "contents": flexContent 
+        }]);
+
+        if (res) { 
+          liff.closeWindow(); 
+        } else { 
+          document.getElementById('loading-icon').style.display = 'none';
+          document.getElementById('status').innerText = "已取消分享"; 
+          setTimeout(() => liff.closeWindow(), 1000); 
+        }
       } catch (e) { 
-        console.error(e);
-        document.getElementById('status').innerText = "❌ 無法分享"; 
+        document.getElementById('loading-icon').style.display = 'none';
+        document.getElementById('status').innerHTML = "❌ 無法分享<br><br>系統訊息：" + e.message; 
+        alert("錯誤代碼：" + e.message); // 彈出視窗顯示具體錯誤
       }
     }
     main();
