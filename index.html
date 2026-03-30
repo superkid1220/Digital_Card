@@ -14,21 +14,26 @@
 </head>
 <body>
   <div class="loader" id="loading-icon"></div>
-  <div id="status">正在開啟分享清單...</div>
+  <div id="status">正在準備名片...</div>
 
   <script>
     async function main() {
       try {
         await liff.init({ liffId: "2009646341-cKmE2OE1" });
+        
+        // 🌟 新增：檢查是否在 LINE App 內開啟
+        if (!liff.isInClient()) {
+          document.getElementById('loading-icon').style.display = 'none';
+          document.getElementById('status').innerText = "⚠️ 請在 LINE App 內點擊此連結，才能使用分享好友功能喔！";
+          return; // 停止執行後續的分享動作
+        }
+
         if (!liff.isLoggedIn()) { 
           liff.login(); 
           return; 
         }
 
-        // 檢查是否有開啟 Share Target Picker 權限
-        if (!liff.isApiAvailable('shareTargetPicker')) {
-          throw new Error("LINE Developers 後台尚未開啟 Share Target Picker 權限！");
-        }
+        document.getElementById('status').innerText = "正在開啟分享清單...";
 
         // 🌟 分享出去的名片內容
         const flexContent = {
@@ -100,8 +105,7 @@
         }
       } catch (e) { 
         document.getElementById('loading-icon').style.display = 'none';
-        document.getElementById('status').innerHTML = "❌ 無法分享<br><br>系統訊息：" + e.message; 
-        alert("錯誤代碼：" + e.message); // 彈出視窗顯示具體錯誤
+        document.getElementById('status').innerHTML = "❌ 發生錯誤，請稍後再試。"; 
       }
     }
     main();
