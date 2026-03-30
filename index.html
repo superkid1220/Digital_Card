@@ -29,7 +29,7 @@
           "header": {
             "type": "box",
             "layout": "vertical",
-            "backgroundColor": "#F5B921", // 修改為與 Logo 圖片背景一致的顏色
+            "backgroundColor": "#E69100", 
             "contents": [{
               "type": "image",
               "url": "https://raw.githubusercontent.com/superkid1220/Digital_Card/main/logo1.png",
@@ -37,7 +37,7 @@
               "aspectMode": "fit"
             }],
             "paddingTop": "xl", "paddingBottom": "xl"
-          },,
+          }, // <-- 這裡原本有多一個逗號，已修正
           "body": {
             "type": "box",
             "layout": "vertical",
@@ -79,7 +79,10 @@
 
         const res = await liff.shareTargetPicker([{ "type": "flex", "altText": "您收到一張來自美時醫藥 Shirley 的數位名片", "contents": flexContent }]);
         if (res) { liff.closeWindow(); } else { document.getElementById('status').innerText = "已取消分享"; setTimeout(() => liff.closeWindow(), 1000); }
-      } catch (e) { document.getElementById('status').innerText = "❌ 無法分享"; }
+      } catch (e) { 
+        console.error(e);
+        document.getElementById('status').innerText = "❌ 無法分享"; 
+      }
     }
     main();
   </script>
