@@ -28,7 +28,7 @@
           return;
         }
 
-        // 🌟 3. 定義【傳送給別人看】的正完美時名片內容 (無分享按鈕，LOGO 區有底色)
+        // 🌟 3. 定義【傳送給別人看】的數位名片內容 (更新官方 Logo 連結)
         const flexContent = {
           "type": "bubble",
           "size": "mega",
@@ -38,8 +38,8 @@
             "backgroundColor": "#E69100", // 美時橘底色
             "contents": [{
               "type": "image",
-              "url": "https://i.imgur.com/5VbX6A4.png", // 穩定的 LOGO 連結
-              "size": "sm",
+              "url": "https://api.lotuspharm.com/storage/site/01KAWVCV72Q3H0K0K5DVEJJWQP.png", // 更新為官方 API 連結
+              "size": "lg", // 稍微調大一點讓 Logo 更清楚
               "aspectMode": "fit"
             }],
             "paddingTop": "xl", "paddingBottom": "xl"
@@ -69,7 +69,7 @@
                 ]
               },
               { "type": "separator", "margin": "xl", "color": "#DDDDDD" },
-              // 按鈕區 (無分享按鈕)
+              // 按鈕區
               {
                 "type": "box",
                 "layout": "vertical",
@@ -78,7 +78,8 @@
                 "contents": [
                   { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "點擊撥打電話", "uri": "tel:+886975856707" }, "color": "#E69100" },
                   { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "訪問美時官方網站", "uri": "https://www.lotuspharm.com/zh-TW" }, "color": "#E69100" },
-                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "追蹤官方 Instagram", "uri": "https://www.instagram.com/lotus_pharmaceuticals/" }, "color": "#E69100" }
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "追蹤官方 Instagram", "uri": "https://www.instagram.com/lotus_pharmaceuticals/" }, "color": "#E69100" },
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "分享此名片給好友", "uri": "https://liff.line.me/2009646341-cKmE2OE1" }, "color": "#E69100" }
                 ]
               }
             ]
@@ -86,6 +87,12 @@
         };
 
         // 4. 啟動選擇器
+        const isSupported = liff.isApiAvailable('shareTargetPicker');
+        if (!isSupported) {
+            alert("請在 LINE App 內開啟此連結以使用分享功能");
+            return;
+        }
+
         const res = await liff.shareTargetPicker([
           {
             "type": "flex",
@@ -95,14 +102,14 @@
         ]);
 
         if (res) {
-          liff.closeWindow(); // 分享成功
+          liff.closeWindow(); // 分享成功後關閉視窗
         } else {
           document.getElementById('status').innerText = "已取消分享";
           setTimeout(() => liff.closeWindow(), 1200);
         }
 
       } catch (error) {
-        // 簡單的錯誤處理，不顯示具體錯誤以保持畫面乾淨
+        console.error(error);
         document.getElementById('status').innerText = "❌ 暫時無法分享，請稍後再試";
       }
     }
