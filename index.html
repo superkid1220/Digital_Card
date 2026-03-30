@@ -6,45 +6,20 @@
   <title>美時 Lotus Shirley 數位名片</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body { 
-      display: flex; 
-      flex-direction: column;
-      justify-content: center; 
-      align-items: center; 
-      height: 100vh; 
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      background-color: #f3f3f3; 
-    }
-    .loader { 
-      border: 4px solid #f3f3f3; 
-      border-top: 4px solid #E69100; /* Lotus 橘 */
-      border-radius: 50%; 
-      width: 40px; 
-      height: 40px; 
-      animation: spin 1s linear infinite; 
-    }
+    body { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f3f3f3; }
+    .loader { border: 4px solid #f3f3f3; border-top: 4px solid #E69100; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     #status { margin-top: 20px; color: #555; font-size: 16px; }
-    #error-msg { margin-top: 10px; color: #E69100; font-size: 14px; padding: 0 20px; text-align: center; }
   </style>
 </head>
 <body>
-
-  <div class="loader" id="loader"></div>
+  <div class="loader"></div>
   <div id="status">正在啟動分享功能...</div>
-  <div id="error-msg"></div>
 
   <script>
-    function showError(msg) {
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('status').innerText = "❌ 暫時無法分享";
-      document.getElementById('error-msg').innerText = msg;
-    }
-
     async function main() {
       try {
-        // 1. 初始化 LIFF (使用原本的 ID)
+        // 1. 初始化 LIFF
         await liff.init({ liffId: "2009646341-cKmE2OE1" });
 
         // 2. 檢查登入
@@ -53,31 +28,27 @@
           return;
         }
 
-        // 3. 定義【傳送給別人看】的名片內容 (美時風格, 無分享按鈕)
+        // 🌟 3. 定義【傳送給別人看】的正完美時名片內容 (無分享按鈕，LOGO 區有底色)
         const flexContent = {
           "type": "bubble",
           "size": "mega",
-          // 頂部 LOGO 區
           "header": {
             "type": "box",
             "layout": "vertical",
-            "backgroundColor": "#FFFFFF",
+            "backgroundColor": "#E69100", // 美時橘底色
             "contents": [{
               "type": "image",
-              "url": "https://www.lotuspharm.com/images/logo.png", // 美時 LOGO
-              "size": "xs",
-              "aspectMode": "fit",
-              "margin": "none"
+              "url": "https://i.imgur.com/5VbX6A4.png", // 穩定的 LOGO 連結
+              "size": "sm",
+              "aspectMode": "fit"
             }],
             "paddingTop": "xl", "paddingBottom": "xl"
           },
-          // 主要資訊區
           "body": {
             "type": "box",
             "layout": "vertical",
             "paddingAll": "20px",
             "contents": [
-              // 姓名
               {
                 "type": "box",
                 "layout": "baseline",
@@ -86,11 +57,8 @@
                   { "type": "text", "text": "Shirley Yang", "size": "sm", "color": "#777777", "margin": "md", "flex": 0 }
                 ]
               },
-              // 職稱與部門
               { "type": "text", "text": "業務代表 / 診所暨藥局業務部", "size": "sm", "color": "#555555", "wrap": true, "margin": "md" },
-              // 聯繫資訊
               { "type": "text", "text": "shirley.yang@lotuspharm.com\n+886975856707", "size": "sm", "color": "#777777", "wrap": true, "margin": "lg" },
-              // 公司資訊
               {
                 "type": "box",
                 "layout": "vertical",
@@ -100,7 +68,6 @@
                   { "type": "text", "text": "110021 台北市信義區松仁路277號17樓", "size": "xs", "color": "#999999", "wrap": true }
                 ]
               },
-              // 分隔線
               { "type": "separator", "margin": "xl", "color": "#DDDDDD" },
               // 按鈕區 (無分享按鈕)
               {
@@ -111,8 +78,7 @@
                 "contents": [
                   { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "點擊撥打電話", "uri": "tel:+886975856707" }, "color": "#E69100" },
                   { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "訪問美時官方網站", "uri": "https://www.lotuspharm.com/zh-TW" }, "color": "#E69100" },
-                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "追蹤官方 Instagram", "uri": "https://www.instagram.com/tesla/" }, "color": "#E69100" },
-                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "加入 LINE 官方帳號", "uri": "https://line.me/R/ti/p/@tesla_taiwan" }, "color": "#E69100" }
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "追蹤官方 Instagram", "uri": "https://www.instagram.com/lotus_pharmaceuticals/" }, "color": "#E69100" }
                 ]
               }
             ]
@@ -136,7 +102,8 @@
         }
 
       } catch (error) {
-        showError("發生錯誤：" + error.message);
+        // 簡單的錯誤處理，不顯示具體錯誤以保持畫面乾淨
+        document.getElementById('status').innerText = "❌ 暫時無法分享，請稍後再試";
       }
     }
     main();
