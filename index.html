@@ -2,30 +2,131 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>極簡測試</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>數位名片分享</title>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body { 
+      display: flex; 
+      flex-direction: column;
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      background-color: #f3f3f3; 
+    }
+    .loader { 
+      border: 4px solid #f3f3f3; 
+      border-top: 4px solid #C00000; 
+      border-radius: 50%; 
+      width: 40px; 
+      height: 40px; 
+      animation: spin 1s linear infinite; 
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    #status { margin-top: 20px; color: #555; font-size: 16px; }
+    #error-msg { margin-top: 10px; color: #C00000; font-size: 14px; padding: 0 20px; text-align: center; }
+  </style>
 </head>
 <body>
-  <h2 id="msg">初始化中...</h2>
+
+  <div class="loader" id="loader"></div>
+  <div id="status">正在啟動分享功能...</div>
+  <div id="error-msg"></div>
+
   <script>
-    async function test() {
+    // 錯誤顯示函式
+    function showError(msg) {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('status').innerText = "❌ 暫時無法分享";
+      document.getElementById('error-msg').innerText = msg;
+    }
+
+    async function main() {
       try {
-        await liff.init({ liffId: "2009646341-cKmE2OE1" }); // 確保 ID 正確
+        // 1. 初始化 LIFF (使用你的 ID)
+        await liff.init({ liffId: "2009646341-cKmE2OE1" });
+
+        // 2. 檢查是否登入
         if (!liff.isLoggedIn()) {
           liff.login();
-        } else {
-          document.getElementById('msg').innerText = "準備分享...";
-          const res = await liff.shareTargetPicker([
-            { "type": "text", "text": "這是一則測試訊息" }
-          ]);
-          liff.closeWindow();
+          return;
         }
-      } catch (e) {
-        document.getElementById('msg').innerText = "錯誤: " + e.message;
+
+        // 3. 檢查分享權限是否開啟
+        if (!liff.isApiAvailable('shareTargetPicker')) {
+          showError("請確保 LINE Developers 後台已開啟 'Share target picker' 權限。");
+          return;
+        }
+
+        // 4. 定義【傳送給別人看】的名片內容 (無分享按鈕版)
+        const flexContent = {
+          "type": "bubble",
+          "size": "mega",
+          "header": {
+            "type": "box",
+            "layout": "vertical",
+            "backgroundColor": "#C00000",
+            "contents": [{
+              "type": "image",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png",
+              "size": "xs",
+              "aspectMode": "fit"
+            }],
+            "paddingTop": "xl", "paddingBottom": "xl"
+          },
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "paddingAll": "20px",
+            "contents": [
+              { "type": "text", "text": "陳凱勛 Felis Chen", "weight": "bold", "size": "xl", "color": "#111111" },
+              { "type": "text", "text": "資深銷售顧問\nTesla Advisor", "size": "sm", "color": "#777777", "wrap": true, "margin": "md" },
+              { "type": "text", "text": "kaischen@tesla.com\n+886970474361", "size": "sm", "color": "#777777", "wrap": true, "margin": "lg" },
+              { "type": "text", "text": "臺北市南港區南港路三段 104 號", "size": "sm", "color": "#777777", "wrap": true, "margin": "lg" },
+              { "type": "separator", "margin": "xl", "color": "#DDDDDD" },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "xl",
+                "spacing": "sm",
+                "contents": [
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "點擊撥打電話", "uri": "tel:+886970474361" } },
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "試駕、換購與家用充電服務", "uri": "https://www.tesla.com/zh_tw/drive" } },
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "追蹤官方 Instagram", "uri": "https://www.instagram.com/tesla/" } },
+                  { "type": "button", "style": "link", "height": "sm", "action": { "type": "uri", "label": "加入 LINE 官方帳號", "uri": "https://line.me/R/ti/p/@tesla_taiwan" } }
+                ]
+              }
+            ]
+          }
+        };
+
+        // 5. 啟動好友選擇器
+        const res = await liff.shareTargetPicker([
+          {
+            "type": "flex",
+            "altText": "您收到一張來自陳凱勛的數位名片",
+            "contents": flexContent
+          }
+        ]);
+
+        if (res) {
+          // 分享成功
+          liff.closeWindow();
+        } else {
+          // 使用者取消分享
+          document.getElementById('status').innerText = "已取消分享";
+          setTimeout(() => liff.closeWindow(), 1200);
+        }
+
+      } catch (error) {
+        showError("發生錯誤：" + error.message);
       }
     }
-    test();
+
+    // 啟動主程式
+    main();
   </script>
 </body>
 </html>
- 
